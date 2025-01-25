@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Versiones de MyJonCraft</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #121212;
+            color: #ffffff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            height: 100vh;
+            margin: 0;
+        }
+        h1 {
+            margin-bottom: 20px;
+        }
+        .version-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        .version-box {
+            background: #1e1e1e;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+            width: 350px;
+            text-align: center;
+        }
+        .version {
+            margin: 10px 0;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <h1>Versiones de MyJonCraft</h1>
+
+    <div class="version-container">
+        <div class="version-box">
+            <h2>Release Edition</h2>
+            <div class="version" id="release-current">Versión Actual: Cargando...</div>
+            <div class="version" id="release-latest">Última Versión: Cargando...</div>
+        </div>
+
+        <div class="version-box">
+            <h2>Beta Edition</h2>
+            <div class="version" id="beta-current">Versión Actual: Cargando...</div>
+            <div class="version" id="beta-latest">Última Versión: Cargando...</div>
+        </div>
+    </div>
+
+    <script>
+        function fetchVersion(localFile, githubFile, currentId, latestId) {
+            // Leer archivo local
+            fetch(localFile)
+                .then(response => {
+                    if (!response.ok) throw new Error();
+                    return response.text();
+                })
+                .then(data => {
+                    document.getElementById(currentId).textContent = `Versión Actual: ${data.trim()}`;
+                })
+                .catch(() => {
+                    document.getElementById(currentId).textContent = "Versión Actual: Versión no instalada o no detectada";
+                });
+
+            // Leer archivo remoto desde GitHub
+            fetch(githubFile)
+                .then(response => {
+                    if (!response.ok) throw new Error("No se pudo leer el archivo de GitHub");
+                    return response.text();
+                })
+                .then(data => {
+                    document.getElementById(latestId).textContent = `Última Versión: ${data.trim()}`;
+                })
+                .catch(error => {
+                    document.getElementById(latestId).textContent = `Error: ${error.message}`;
+                });
+        }
+
+        // Función para actualizar cada 5 segundos
+        function updateVersions() {
+            fetchVersion('v_actual.txt', 'https://raw.githubusercontent.com/acierto-incomodo/MyJonCraft/main/ultima_version.txt', 'release-current', 'release-latest');
+            fetchVersion('v_beta_actual.txt', 'https://raw.githubusercontent.com/acierto-incomodo/MyJonCraft/main/v_beta_ultima_version.txt', 'beta-current', 'beta-latest');
+            console.log("Actualizando versiones cada 5 segundos...");
+        }
+
+        // Ejecutar por primera vez al cargar la página
+        updateVersions();
+
+        // Actualizar cada 5 segundos (5000 ms)
+        setInterval(updateVersions, 5000);
+    </script>
+</body>
+</html>
